@@ -1,34 +1,43 @@
 import { defineCollection, type ImageFunction } from 'astro:content';
 import { glob } from 'astro/loaders';
 import { z } from 'zod';
+const CONTENT_BASE_PATH = './src/content';
+
+const seoSchema = (image: ImageFunction) => z.object({
+    title: z.string(),
+    description: z.string(),
+    type: z.string().default('website'),
+    keywords: z.string().optional(),
+    canonicalUrl: z.string().optional(),
+    twitter: z.object({
+        creator: z.string().optional(),
+    }).optional(),
+    robots: z.string().optional(),
+    image: image().optional(),
+});
 
 export const seoSchemaWithoutImage = z.object({
-  title: z.string(),
-  description: z.string(),
-  type: z.string().optional(),
-  keywords: z.string().optional(),
-  canonicalUrl: z.string().optional(),
-  twitter: z.object({
-    creator: z.string().optional(),
-  }).optional(),
-  robots: z.string().optional(),
-})
-
-const seoSchema = (image: ImageFunction) =>
-  z.object({
-    image: image().optional(),
-  }).merge(seoSchemaWithoutImage);
+    title: z.string(),
+    description: z.string(),
+    type: z.string().default('website'),
+    keywords: z.string().optional(),
+    canonicalUrl: z.string().optional(),
+    twitter: z.object({
+        creator: z.string().optional(),
+    }).optional(),
+    robots: z.string().optional()
+});
 
 const pageCollection = defineCollection({
-  loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: './src/content/pages' }),
-  schema: ({ image }) => z.object({
-    title: z.string(),
-    seo: seoSchema(image),
-  }),
+    loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: `${CONTENT_BASE_PATH}/pages` }),
+    schema: ({ image }) => z.object({
+        title: z.string(),
+        seo: seoSchema(image)
+    }),
 });
 
 const linkCollection = defineCollection({
-  loader: glob({ pattern: '**/[^_]*.yml', base: './src/content/links' }),
+    loader: glob({ pattern: '**/[^_]*.yml', base: `${CONTENT_BASE_PATH}/links` }),
   schema: z.object({
     label: z.string(),
     name: z.string(),
@@ -37,7 +46,7 @@ const linkCollection = defineCollection({
 });
 
 const jobCollection = defineCollection({
-  loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: './src/content/jobs' }),
+    loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: `${CONTENT_BASE_PATH}/jobs` }),
   schema: z.object({
     title: z.string(),
     company: z.string(),
@@ -49,7 +58,7 @@ const jobCollection = defineCollection({
 });
 
 const talkCollection = defineCollection({
-  loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: './src/content/talks' }),
+    loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: `${CONTENT_BASE_PATH}/talks` }),
   schema: z.object({
     title: z.string(),
     year: z.number(),
@@ -60,19 +69,20 @@ const talkCollection = defineCollection({
 });
 
 const postCollection = defineCollection({
-  loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: './src/content/posts' }),
-  schema: ({ image }) => z.object({
-    title: z.string(),
-    date: z.date(),
-    image: image().optional(),
-    seo: seoSchema(image),
-  }),
+    loader: glob({ pattern: '**/[^_]*.{md,mdx}', base: `${CONTENT_BASE_PATH}/posts` }),
+    schema: ({ image }) => z.object({
+        title: z.string(),
+                date: z.date(),
+        image: image().optional(),
+        seo: seoSchema(image),
+    }),
 });
 
 export const collections = {
-  pages: pageCollection,
-  links: linkCollection,
-  jobs: jobCollection,
-  talks: talkCollection,
-  posts: postCollection,
+    pages: pageCollection,
+    links: linkCollection,
+    jobs: jobCollection,
+    talks: talkCollection,
+    posts: postCollection,
 };
+
