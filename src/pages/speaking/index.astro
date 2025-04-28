@@ -1,0 +1,38 @@
+---
+import { getCollection } from 'astro:content';
+import Author from '@/components/ui/Author.astro';
+import Container from '@/components/Container.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { DEFAULT_CONFIGURATION } from '@/lib/constants';
+import Talk from '@/components/ui/Talk.astro';
+
+// Get all talks and sort by year (newest first)
+const allTalks = await getCollection('talks');
+const talks = [...allTalks].sort((a, b) => Number(b.data.year) - Number(a.data.year));
+
+// Create a page-specific SEO object since there isn't a content entry for the speaking page
+const pageSeo = {
+  title: `Speaking — ${DEFAULT_CONFIGURATION.author.name}`,
+  description: `Talks and presentations by ${DEFAULT_CONFIGURATION.author.name} on topics including XR, AI, and creative technology.`,
+  type: 'website',
+  image: DEFAULT_CONFIGURATION.seo.image,
+};
+---
+
+<BaseLayout seo={pageSeo}>
+  <section class="py-6">
+    <Container>
+      <Author {...DEFAULT_CONFIGURATION.author} />
+    </Container>
+  </section>
+  <section class="py-6">
+    <Container>
+      <div class="flex flex-col gap-6">
+        <span class="text-headings">Speaking Engagements</span>
+        <ul class="flex flex-col gap-8">
+          {talks.map((talk) => <Talk entry={talk} />)}
+        </ul>
+      </div>
+    </Container>
+  </section>
+</BaseLayout> 

@@ -1,0 +1,34 @@
+---
+import { getCollection, getEntry } from 'astro:content';
+import Author from '@/components/ui/Author.astro';
+import Container from '@/components/Container.astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import { DEFAULT_CONFIGURATION } from '@/lib/constants';
+import PostPreview from '@/components/ui/PostPreview.astro';
+
+const entry = await getEntry('pages', 'writing');
+
+if (!entry) {
+  throw new Error("Homepage entry not found. Please ensure 'src/content/pages/homepage/index.mdx' exists and is valid.");
+}
+
+const posts = await getCollection('posts');
+---
+
+<BaseLayout seo={entry.data.seo}>
+  <section class="py-6">
+    <Container>
+      <Author {...DEFAULT_CONFIGURATION.author} />
+    </Container>
+  </section>
+  <section class="py-6">
+    <Container>
+      <div class="flex flex-col gap-6">
+        <span class="text-headings">Latest posts</span>
+        <ul class="flex flex-col gap-3">
+          {posts.map((post) => <PostPreview entry={post} />)}
+        </ul>
+      </div>
+    </Container>
+  </section>
+</BaseLayout>
